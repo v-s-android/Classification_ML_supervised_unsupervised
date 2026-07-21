@@ -1,0 +1,162 @@
+'''
+ different strategies of Multi-class classification and implement the same on a real-world dataset.
+
+- Understand the use of one-hot encoding for categorical variables.
+- Implement logistic regression for multi-class classification using One-vs-All (OvA) and One-vs-One (OvO) strategies.
+- Evaluate model performance using appropriate metrics.
+
+ '''
+
+# Import Necessary Libraries
+!pip install numpy==2.2.0
+!pip install pandas==2.2.3
+!pip install scikit-learn==1.6.0
+!pip install matplotlib==3.9.3
+!pip install seaborn==0.13.2
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.multiclass import OneVsOneClassifier
+from sklearn.metrics import accuracy_score
+
+# Load the dataset
+url = "https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/GkDzb7bWrtvGXdPOfk6CIg/Obesity-level-prediction-dataset.csv"
+df = pd.read_csv(url)
+df.head()
+
+# Exploratory Data Analysis
+'''
+Visualize the distribution of the target variable to understand the class balance.
+'''
+sns.countplot(y = "NObeyesdad" , data = df)
+plt.title("Distribution of Obesity Levels")
+plt.show()
+
+# Exercise 1¶
+# Check for null values, and display a summary of the dataset (use .info() and .describe() methods).
+print(df.isnull().sum()) # displays the count of null values in each column
+'''
+Gender                            0
+Age                               0
+Height                            0
+Weight                            0
+family_history_with_overweight    0
+FAVC                              0
+FCVC                              0
+NCP                               0
+CAEC                              0
+SMOKE                             0
+CH2O                              0
+SCC                               0
+FAF                               0
+TUE                               0
+CALC                              0
+MTRANS                            0
+NObeyesdad                        0
+dtype: int64
+'''
+print(df.describe()) # Descriptive statistics for numerical columns.
+print(df.info()) # Dataset info including column names, data types, and memory usage.
+
+# Preprocessing the data
+'''
+Feature scaling
+Scale the numerical features to standardize their ranges for better model performance.
+
+Standardization of data is important to better define the decision boundaries between classes by making sure that the feature variations are in similar scales.
+The data is now ready to be used for training and testing.
+'''
+# creating a list of columns that have float datatype
+float_columns = df.select_dtypes(include = ['float64']).columns.tolist() 
+
+std_scaler = StandardScaler()
+scaled_columns = std_scaler.fit_transform(df[float_columns]) #  standardizing the columns 
+
+# Converting to a DataFrame
+sacled_df = pd.DataFrame(scaled_columns , columns = std_scaler.get_feature_names_out(float_columns)) # using the same names as it is in df
+
+new_df = pd.concat([df.drop(columns = float_columns), sacled_df ],axis = 1) # dropping and concatinating the old df columns with the new standardized columns
+
+'''
+One-hot encoding 
+Convert categorical variables into numerical format using one-hot encoding.
+'''
+
+# get the list of categorical variables
+categorical_columns = new_df.select_dtypes(include = ['object']).columns.tolist()
+categorical_columns.remove("NObeyesdad") # Remove the target column name from the list
+
+print(categorical_columns) # ['Gender', 'family_history_with_overweight', 'FAVC', 'CAEC', 'SMOKE', 'SCC', 'CALC', 'MTRANS']
+
+encoder = OneHotEncoder(sparse_output=False, drop='first')
+encoded_features = encoder.fit_transform(df[categorical_columns])
+'''
+Color
+Red
+Blue      
+Green
+Red
+'''
+# becomes
+'''
+Color_Blue	Color_Green	Color_Red
+0	        0	              1
+1	        0	              0
+0        	1	              0
+0	        0	              1
+'''
+# then we drop ='first'
+'''
+the encoder drops the first category.
+Green	Red
+0	  1
+0	  0
+1	  0
+
+Now:
+
+(0,0) means Blue
+(0,1) means Red
+(1,0) means Green
+
+You still have enough information to distinguish all categories while avoiding redundant columns.
+'''
+
+# Creating a dataframe
+encoded_df = pd.DataFrame(encoded_features, columns =  encoder.get_feature_names_out(categorical_columns)) # makinf use of the same column name
+prepped_df = pd.concat( [new_df.drop(columns = categorical_columns), encoded_df] , axis = 1) # drop the categorical_columns and concatinate encoded dataframe at the end
+
+prepped_df.head()
+
+'''
+Encode the target variable
+'''
+# Encoding the target variable
+prepped_df['NObeyesdad'] = prepped_df['NObeyesdad'].astype('category').cat.codes # converting into category codes
+prepped_df.head()
+
+'''
+Separate the input and target data
+'''
+y = prepped_df['NObeyesdad'] # assign the target feature 
+
+X = prepped_df.drop( 'NObeyesdad' , axis = 1) # then delete it from dataframe
+
+'''
+Model training and evaluation
+Splitting the data set
+Split the data into training and testing subsets.
+'''
+
+X_train, X_test, y_train, y_test = train_test_split( X , y , test_size = 0.20, random_state = 1 , stratify = y )
+# stratify=y = This makes sure the class proportions in your training and testing sets stay similar to those in the original dataset.
+
+
+
+
+

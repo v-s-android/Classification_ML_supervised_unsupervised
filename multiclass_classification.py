@@ -157,6 +157,7 @@ X_train, X_test, y_train, y_test = train_test_split( X , y , test_size = 0.20, r
 # stratify=y = This makes sure the class proportions in your training and testing sets stay similar to those in the original dataset.
 
 '''
+Logistic Regression with One-vs-All
 Train a logistic regression model using the One-vs-All strategy and evaluate its performance.
 '''
 
@@ -173,4 +174,54 @@ One-vs-All (OvA) Strategy
  the accuracy is 76.12 %
 '''
 
+'''
+Logistic Regression with OvO
+Train a logistic regression model using the One-vs-One (OvO) strategy and evaluate its performance.
+'''
+model_ovo = OneVsOneClassifier(LogisticRegression(max_iter = 1000))
+model_ovo.fit(X_train, y_train)
+
+y_ovo_pred = model_ovo.predict(X_test)
+print(f" the accuracy is {np.round( 100 * accuracy_score(y_test, y_ovo_pred),2)} % ")
+'''
+One-vs-One (OvO) Strategy
+ the accuracy is 92.2 % 
+'''
+
+'''
+Exercises
+Q1. Experiment with different test sizes in the train_test_split method (e.g., 0.1, 0.3) and observe the impact on model performance.
+'''
+for test_size in [0.1, 0.3]:
+    X_train, X_test, y_train , y_test = train_test_split( X , y , test_size= test_size, random_state= 42, stratify= y)
+    model_ova.fit(X_train, y_train)
+    y_ova_pred = model_ova.predict(X_test)
+    print(f"the accuracy of test_size: {test_size} is {np.round(100 * accuracy_score(y_test, y_ova_pred),2)}%")
+'''
+the accuracy of test_size: 0.1 is 75.94%
+the accuracy of test_size: 0.3 is 74.92% 
+'''
+
+'''
+Q2. Plot a bar chart of feature importance using the coefficients from the One vs All logistic regression model. Also try for the One vs One model.
+'''
+# Feature importance
+feature_importance = np.mean(np.abs(model_ova.coef_), axis=0)
+plt.barh(X.columns, feature_importance)
+plt.title("Feature Importance")
+plt.xlabel("Importance")
+plt.show()
+
+# For One vs One model
+# Collect all coefficients from each underlying binary classifier
+coefs = np.array([est.coef_[0] for est in model_ovo.estimators_])
+
+# Now take the mean across all those classifiers
+feature_importance = np.mean(np.abs(coefs), axis=0)
+
+# Plot feature importance
+plt.barh(X.columns, feature_importance)
+plt.title("Feature Importance (One-vs-One)")
+plt.xlabel("Importance")
+plt.show()
 

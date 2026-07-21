@@ -156,7 +156,21 @@ Split the data into training and testing subsets.
 X_train, X_test, y_train, y_test = train_test_split( X , y , test_size = 0.20, random_state = 1 , stratify = y )
 # stratify=y = This makes sure the class proportions in your training and testing sets stay similar to those in the original dataset.
 
+'''
+Train a logistic regression model using the One-vs-All strategy and evaluate its performance.
+'''
 
+model_ova = LogisticRegression(multi_class = "ovr" , max_iter = 1000)
+model_ova.fit(X_train, y_train)
 
+# You can now evaluate the accuracy of the trained model as a measure of its performance on unseen testing data.
+y_pred_ova = model_ova.predict(X_test)
+
+print("One-vs-All (OvA) Strategy")
+print(f" the accuracy is {np.round ( 100 * accuracy_score(y_test , y_pred_ova), 2)} %")
+'''
+One-vs-All (OvA) Strategy
+ the accuracy is 76.12 %
+'''
 
 

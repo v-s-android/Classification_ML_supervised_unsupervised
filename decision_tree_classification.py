@@ -82,3 +82,64 @@ Execute the following cell to achieve the same.
 custom_map_dict = { 'drugA':0, 'drugB':1, 'drugC':2, 'drugX':3, 'drugY':4 }
 df['Drug_value'] = df['Drug'].map(custom_map_dict) # we are mapping the dictionary and creating/assigning it to a new column
 df.head()
+
+'''
+You can now use the corr() function to find the correlation of the input variables with the target variable.
+'''
+
+'''
+Practice question
+Write the code to find the correlation of the input variables with the target variable and identify the features most significantly affecting the target.
+'''
+# corr() - computes the correlation matrix between all numeric columns.
+df_new =  df.drop('Drug' , axis= 1) # The object column "Drug" is removed because correlation only works with numeric data.
+df_new.head()
+print(df_new.corr()) # Each value tells you how strongly two variables are linearly related.
+print(df_new.corr()['Drug_value']) # selecting only the Drug_value wrt the other remaining features
+'''
+                  Age       Sex        BP  Cholesterol   Na_to_K  Drug_value
+Age          1.000000  0.102027  0.054212    -0.068234 -0.063119   -0.004828
+Sex          0.102027  1.000000 -0.007814    -0.008811 -0.125008   -0.098573
+BP           0.054212 -0.007814  1.000000    -0.137552 -0.149312    0.372868
+Cholesterol -0.068234 -0.008811 -0.137552     1.000000  0.010000    0.055629
+Na_to_K     -0.063119 -0.125008 -0.149312     0.010000  1.000000    0.589120
+Drug_value  -0.004828 -0.098573  0.372868     0.055629  0.589120    1.000000
+
+
+Age           -0.004828
+Sex           -0.098573
+BP             0.372868 # this is the second best 
+Cholesterol    0.055629
+Na_to_K        0.589120 # this is the first best among the features
+Drug_value     1.000000
+Name: Drug_value, dtype: float64
+
+This shows that the drug recommendation is mostly correlated with the Na_to_K and BP features.
+'''
+
+# alreanatively use df.drop('Drug',axis=1).corr()['Drug_value'] : this doesnot delete the Drug column rather just excludes it while running corr()
+
+'''
+We can also understand the distribution of the dataset by plotting the count of the records with each drug recommendation.
+'''
+drug_counts = df['Drug'].value_counts()
+
+print(drug_counts)
+'''
+Drug
+drugY    91
+drugX    54
+drugA    23
+drugC    16
+drugB    16
+Name: count, dtype: int64
+'''
+
+plt.bar(drug_counts.index , drug_counts.values, color = 'blue')
+plt.xlabel('Drug')
+plt.ylabel('Count')
+plt.title('Category Distribution')
+plt.xticks(rotation=45)  # Rotate labels for better readability if needed
+plt.show()
+
+

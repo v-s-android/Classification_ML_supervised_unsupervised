@@ -117,7 +117,17 @@ Name: Drug_value, dtype: float64
 This shows that the drug recommendation is mostly correlated with the Na_to_K and BP features.
 '''
 
-# alreanatively use df.drop('Drug',axis=1).corr()['Drug_value'] : this doesnot delete the Drug column rather just excludes it while running corr()
+'''
+Alternatively, use `df.drop('Drug',axis=1).corr()['Drug_value']` : this doesnot delete the Drug column rather just excludes it while running corr()
+we still get:
+Age           -0.004828
+Sex           -0.098573
+BP             0.372868 # this is the second best 
+Cholesterol    0.055629
+Na_to_K        0.589120 # this is the first best among the features
+Drug_value     1.000000
+Name: Drug_value, dtype: float64
+'''
 
 '''
 We can also understand the distribution of the dataset by plotting the count of the records with each drug recommendation.
@@ -141,5 +151,26 @@ plt.ylabel('Count')
 plt.title('Category Distribution')
 plt.xticks(rotation=45)  # Rotate labels for better readability if needed
 plt.show()
+
+
+'''
+Modeling
+For modeling this dataset with a Decision tree classifier, we first split the dataset into training and testing subsets. 
+For this, we separate the target variable from the input variables.
+'''
+y = df['Drug'] # the target variable
+X = df.drop(['Drug','Drug_value'], axis=1) # we should not have any the drug columns for X, now this ONLY contains the input variables
+
+'''
+Now, use the train_test_split() function to separate the training data from the testing data. We can make use of 30% of the data for testing and the rest for training the Decision tree.
+'''
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=32)
+
+'''
+You can now define the Decision tree classifier as drugTree and train it with the training data.
+'''
+
+drug_decicsion_tree = DecisionTreeClassifier(criterion="entropy", max_depth = 4)
+drug_decicsion_tree.fit(X_train, y_train)
 
 

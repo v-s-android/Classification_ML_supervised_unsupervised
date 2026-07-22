@@ -23,7 +23,7 @@ from matplotlib import pyplot as plt
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier, plot_tree
-from sklearn import metrics
+from sklearn.metrics import accuracy_score
 
 # Downloading the Data
 path= 'https://cf-courses-data.s3.us.cloud-object-storage.appdomain.cloud/IBMDeveloperSkillsNetwork-ML0101EN-SkillsNetwork/labs/Module%203/data/drug200.csv'
@@ -173,4 +173,34 @@ You can now define the Decision tree classifier as drugTree and train it with th
 drug_decicsion_tree = DecisionTreeClassifier(criterion="entropy", max_depth = 4)
 drug_decicsion_tree.fit(X_train, y_train)
 
+'''
+Evaluation
+Now that you have trained the decision tree, we can use it to generate the predictions on the test set.
+'''
+
+y_tree_pred = drug_decicsion_tree.predict(X_test)
+print(f"the accuracy is {np.round(100 * accuracy_score(y_test,y_tree_pred ),2)}%")
+'''
+the accuracy is 98.33%
+This means that the model was able to correctly identify the labels of 98.33%, i.e. 59 out of 60 test samples.
+'''
+
+'''
+Visualize the tree
+To understand the classification criteria derived by the Decision Tree, we may generate the tree plot.
+'''
+plot_tree(drug_decicsion_tree)
+plt.show()
+
+'''
+Practice Question:
+If the max depth of the tree is reduced to 3, how would the performance of the model be affected?
+'''
+drug_decicsion_tree1 = DecisionTreeClassifier(criterion="entropy", max_depth = 3)
+drug_decicsion_tree1.fit(X_train, y_train)
+y_tree_decision = drug_decicsion_tree1.predict(X_test)
+print(f"the accuracy is {np.round(100 * accuracy_score(y_test,y_tree_pred ),2)}%")
+'''
+the accuracy is 98.33%
+'''
 

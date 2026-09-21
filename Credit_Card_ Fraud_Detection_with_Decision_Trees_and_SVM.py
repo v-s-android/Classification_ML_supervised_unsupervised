@@ -75,3 +75,95 @@ fig, ax = plt.subplots()
 ax.pie(sizes, labels=labels, autopct='%1.3f%%')
 ax.set_title('Target Variable Value Counts')
 plt.show()
+
+"""
+As shown above, the Class variable has two values: 0 (the credit card transaction is legitimate) and 1 (the credit card transaction is fraudulent).
+Thus, you need to model a binary classification problem. Moreover, the dataset is highly unbalanced, the target variable classes are not represented equally. 
+This case requires special attention when training or when evaluating the quality of a model. One way of handing this case at train time is to bias the model 
+to pay more attention to the samples in the minority class. The models under the current study will be configured to take into account the class weights of the samples at train/fit time.
+
+It is also prudent to understand which features affect the model in what way. We can visualize the effect of the different features on the model using the code below.
+
+"""
+correlation_values = raw_data.corr()['Class'].drop('Class')
+correlation_values.plot(kind='barh', figsize=(10, 6))
+
+"""
+Dataset Preprocessing
+
+You will now prepare the data for training. You will apply standard scaling to the input features and normalize them using "L1" norm for the training models to converge quickly.
+As seen in the data snapshot, there is a parameter called Time which we will not be considering for modeling. Hence, features 2 to 30 will be used as input features and feature 31,
+i.e. Class will be used as the target variable.
+"""
+
+# standardize features by removing the mean and scaling to unit variance
+raw_data.iloc[:, 1:30] = StandardScaler().fit_transform(raw_data.iloc[:, 1:30]) # [:, 1:30] means all rows and 1 to 30 columns
+data_matrix = raw_data.values
+
+# X: feature matrix (for this analysis, we exclude the Time variable from the dataset)
+X = data_matrix[:, 1:30]
+print("feature matrix: ",X)
+
+# y: labels vector
+y = data_matrix[:, 30] # the last column
+print("labels vector: ", y)
+
+# data normalization
+X = normalize(X, norm="l1")
+print("normalize: ", X)
+
+"""
+Dataset Train/Test Split¶
+Now that the dataset is ready for building the classification models, you need to first divide the pre-processed dataset into a subset to be used for training
+the model (the train set) and a subset to be used for evaluating the quality of the model (the test set).
+"""
+
+X_train, X_test, y_train, y_test = train_test_split( X , y , test_size = 0.3, random_state = 42)
+
+"""
+Build a Decision Tree Classifier model with Scikit-Learn
+Compute the sample weights to be used as input to the train routine so that it takes into account the class imbalance present in this dataset.
+"""
+w_train = compute_sample_weight('balanced', y_train)
+
+"""
+Using these sample weights, we may train the Decision Tree classifier.
+"""
+
+# for reproducible output across multiple function calls, set random_state to a given integer value
+dt = DecisionTreeClassifier(max_depth=4, random_state=35)
+dt.fit(X_train, y_train, sample_weight = w_train)
+
+"""
+Build a Support Vector Machine model with Scikit-Learn
+Unlike Decision Trees, we do not need to initiate a separate sample_weight for SVMs. We can simply pass a parameter in the scikit-learn function.
+"""
+
+# for reproducible output across multiple function calls, set random_state to a given integer value
+svm = LinearSVC(class_weight='balanced', random_state=31, loss = "hinge", fit_intercept = False)
+svm.fit(X_train, y_train)
+
+"""
+Evaluate the Decision Tree Classifier Models
+the below computes the probabilities of the test samples belonging to the class of fraudulent transactions.
+"""
+
+y_pred_dt = dt.predict_proba(X_test)[:, 1]
+
+"""
+Using these probabilities, we can evaluate the Area Under the Receiver Operating Characteristic Curve (ROC-AUC) score as a metric of model performance.
+The AUC-ROC score evaluates your model's ability to distinguish positive and negative classes considering all possible probability thresholds. 
+The higher its value, the better the model is considered for separating the two classes of values.
+"""
+roc_auc_dt = roc_auc_score(y_test , y_pred_dt)
+print('Decision Tree ROC-AUC score : {0:.3f}'.format(roc_auc_dt)) # Decision Tree ROC-AUC score : 0.939
+
+"""
+Evaluate the Support Vector Machine Models
+the below computes the probabilities of the test samples belonging to the class of fraudulent transactions.
+"""
+y_pred_svm = svm.decesion_function(X_test)
+
+# evaluate the accuracy of SVM on the test set in terms of the ROC-AUC score.
+roc_auc_svm = roc_auc_score(y_test, y_pred_svm)
+print("SVM ROC-AUC score: {0:.3f}".format(roc_auc_svm)) #SVM ROC-AUC score: 0.986

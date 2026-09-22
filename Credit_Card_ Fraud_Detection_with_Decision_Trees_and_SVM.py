@@ -167,3 +167,21 @@ y_pred_svm = svm.decesion_function(X_test)
 # evaluate the accuracy of SVM on the test set in terms of the ROC-AUC score.
 roc_auc_svm = roc_auc_score(y_test, y_pred_svm)
 print("SVM ROC-AUC score: {0:.3f}".format(roc_auc_svm)) #SVM ROC-AUC score: 0.986
+
+# practice
+# Use the corr() function to find the top 6 features of the dataset to train the models on.
+correlation_values = abs(raw_data.corr()['Class']).drop('Class')
+correlation_values = correlation_values.sort_values(ascending=False)[:6]
+correlation_values
+"""
+V17    0.326481
+V14    0.302544
+V12    0.260593
+V10    0.216883
+V16    0.196539
+V3     0.192961
+"""
+# Using only these 6 features, modify the input variable for training.
+X = data_matrix[:,[3,10,12,14,16,17]]
+
+

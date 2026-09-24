@@ -115,3 +115,35 @@ Random Forest:  Training Time = 18.080 seconds, Testing time = 0.226 seconds
 Next, you want to generate scatter plots between the predicted and actual values for both models so you can visually evaluate how well each model performs. We'll also plot
 lines one standard deviation of the test data above and below the ideal line, that is, the line that represents the perfect regressor, where the predictions are all correct.
 """
+# Exercise 6. Calculate the standard deviation of the test data
+# Standard deviation of y_test
+std_y = np.std(y_test)
+print(std_y) # 1.1447309632576992
+
+plt.figure(figsize=(14, 6))
+
+# Random Forest plot
+plt.subplot(1, 2, 1)
+plt.scatter(y_test, y_pred_rf, alpha=0.5, color="blue",ec='k')
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2,label="perfect model")
+plt.plot([y_test.min(), y_test.max()], [y_test.min() + std_y, y_test.max() + std_y], 'r--', lw=1, label="+/-1 Std Dev")
+plt.plot([y_test.min(), y_test.max()], [y_test.min() - std_y, y_test.max() - std_y], 'r--', lw=1, )
+plt.ylim(0,6)
+plt.title("Random Forest Predictions vs Actual")
+plt.xlabel("Actual Values")
+plt.ylabel("Predicted Values")
+plt.legend()
+
+
+# XGBoost plot
+plt.subplot(1, 2, 2)
+plt.scatter(y_test, y_pred_xgb, alpha=0.5, color="orange",ec='k')
+plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'k--', lw=2,label="perfect model")
+plt.plot([y_test.min(), y_test.max()], [y_test.min() + std_y, y_test.max() + std_y], 'r--', lw=1, label="+/-1 Std Dev")
+plt.plot([y_test.min(), y_test.max()], [y_test.min() - std_y, y_test.max() - std_y], 'r--', lw=1, )
+plt.ylim(0,6)
+plt.title("XGBoost Predictions vs Actual")
+plt.xlabel("Actual Values")
+plt.legend()
+plt.tight_layout()
+plt.show()

@@ -52,5 +52,66 @@ This is a moderately sized dataset used for this analysis.
 Keep in mind you are only using one dataset so you have to consider that the comparison may change with scale.
 """
 
+"""
+Initialize models
+In this step you define the number of base estimators, or individual trees, to be used in each model, and then intialize models for Random Forest regression and XGBoost regression.
+You'll just use the default parameters to make the performance comparisons. As a part of the performance comparison, we'll also measure the training times for both models.
+"""
 
+# Initialize models
+n_estimators=100
+rf = RandomForestRegressor(n_estimators=n_estimators, random_state=42)
+xgb = XGBRegressor(n_estimators=n_estimators, random_state=42)
 
+# Fit models
+# Measure training time for Random Forest
+start_time_rf = time.time()
+rf.fit(X_train, y_train)
+end_time_rf = time.time()
+rf_train_time = end_time_rf - start_time_rf # 18.079978704452515
+
+# Measure training time for XGBoost
+start_time_xgb = time.time()
+xgb.fit(X_train, y_train)
+end_time_xgb = time.time()
+xgb_train_time = end_time_xgb - start_time_xgb # 0.5045418739318848
+
+"""
+Exercise 2. Use the fitted models to make predictions on the test set.
+Also, measure the time it takes for each model to make its predictions using the time.time() function to measure the times before and after each model prediction.
+"""
+# Measure prediction time for Random Forest
+start_time_rf = time.time()
+y_pred_rf = rf.predict(X_test)
+end_time_rf = time.time()
+rf_pred_time = end_time_rf - start_time_rf # 0.22633743286132812
+
+# Measure prediciton time for XGBoost
+start_time_xgb = time.time()
+y_pred_xgb = xgb.predict(X_test)
+end_time_xgb = time.time()
+xgb_pred_time = end_time_xgb - start_time_xgb # 0.0165860652923584
+
+# Exercise 3: Calulate the MSE and R^2 values for both models
+mse_rf = mean_squared_error(y_test, y_pred_rf)
+mse_xgb = mean_squared_error(y_test, y_pred_xgb)
+r2_rf = r2_score(y_test , y_pred_rf)
+r2_xgb = r2_score(y_test , y_pred_xgb)
+
+print(f' Random Forrest MSE = {mse_rf:.4f} and r2_score = {r2_rf:.4f}') # Random Forrest MSE = 0.2556 and r2_score = 0.8050
+print(f' XGB MSE = {mse_xgb:.4f} and r2_score = {r2_xgb:.4f}') # XGB MSE = 0.2226 and r2_score = 0.8301
+"""
+You can see from the MSE and R^2 values that XGBoost is better than Random Forest, but the differences aren't overwhelming.
+"""
+
+print(f'Random Forest:  Training Time = {rf_train_time:.3f} seconds, Testing time = {rf_pred_time:.3f} seconds')
+print(f'      XGBoost:  Training Time = {xgb_train_time:.3f} seconds, Testing time = {xgb_pred_time:.3f} seconds')
+"""
+Random Forest:  Training Time = 18.080 seconds, Testing time = 0.226 seconds
+      XGBoost:  Training Time = 0.505 seconds, Testing time = 0.017 seconds
+"""
+
+"""
+Next, you want to generate scatter plots between the predicted and actual values for both models so you can visually evaluate how well each model performs. We'll also plot
+lines one standard deviation of the test data above and below the ideal line, that is, the line that represents the perfect regressor, where the predictions are all correct.
+"""

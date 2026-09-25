@@ -142,4 +142,28 @@ ax.set_yticks(())
 # Show the plot
 plt.show()
 
+"""
+Exercise 1
+Try to cluster the above dataset into a different number of clusters, say k=3. Note the difference in the pattern generated.
+"""
+k_means3 = KMeans(init="k-means++", n_clusters=3, n_init=12)
+k_means3.fit(X)
+fig = plt.figure(figsize=(6, 4))
+colors = plt.cm.tab10(np.linspace(0, 1, len(set(k_means3.labels_))))
+ax = fig.add_subplot(1, 1, 1)
+for k, col in zip(range(len(k_means3.cluster_centers_)), colors):
+    my_members = (k_means3.labels_ == k)
+    cluster_center = k_means3.cluster_centers_[k]
+    ax.plot(X[my_members, 0], X[my_members, 1], 'w', markerfacecolor=col, marker='.',ms=10)
+    ax.plot(cluster_center[0], cluster_center[1], 'o', markerfacecolor=col,  markeredgecolor='k', markersize=6)
+plt.show()
+
+"""
+Comment on the within-cluster sum of squares, i.e. inertia, of the clusters created for k=3 and k=5.
+
+For k=3, the value of within-cluster sum of squares will be higher that that for k=4, since the points from different natural clusters are being grouped together, 
+leading to underfitting of the k-means model. For k=5, the value of will be lesser than that for k=4, since the points are distributed into mode clusters than needed,
+leading to over-fitting of the k-means model.
+"""
+
 

@@ -271,7 +271,55 @@ DBSCAN agglomerates neighboring clusters together when they are close enough.
 
 Let's see how a hierarchical density-based clustering algorithm like HDBSCAN performs.
 """
- 
 
+"""
+Build an HDBSCAN clustering model¶
+At this stage, you've already loaded your data and extracted the museum coordinates into a dataframe, df.
 
+You've also stored properly scaled coordinates as the 'coords_scaled' array.
 
+All that remains is to:
+
+Fit and transform HDBSCAN to your scaled coordinates
+Extract the cluster labels
+Plot the results on the same basemap as before
+Reasonable HDBSCAN parameters have been selected for you to start with.
+"""
+
+# Initialize an HDBSCAN model
+min_samples = None
+min_cluster_size = 3
+hdb = hdbscan.HDBSCAN(min_samples=min_samples, min_cluster_size = min_cluster_size, metric='euclidean')  # SEE "import hdbscan" above, also You can adjust parameters as needed
+
+# Exercise 6. Assign the cluster labels to your unscaled coordinate dataframe and display the counts of each cluster label.
+# Assign labels
+df['Cluster'] = hdb.fit_predict(coords_scaled)  # Another way to assign the labels
+# Display the size of each cluster
+print(df['Cluster'].value_counts())
+df.head()
+
+"""
+Cluster
+-1      468
+ 142     45
+ 95      39
+ 59      34
+ 77      29
+       ... 
+ 110      3
+ 0        3
+ 133      3
+ 111      3
+ 136      3
+Name: count, Length: 144, dtype: int64
+Latitude	Longitude	Cluster
+1	55.264551	-127.642812	4
+2	45.963283	-66.641902	33
+8	49.176354	-123.112783	-1
+13	49.261938	-123.151123	-1
+15	49.889559	-97.235744	100
+
+As you can see, unlike the case for DBSCAN, clusters quite uniformly sized, although there is a quite lot of noise identified.
+"""
+# Exercise 7. Plot the hierarchically clustered museums on a basemap of Canada, colored by cluster label.
+plot_clustered_locations(df , title='Museums Hierarchically Clustered by Proximity')

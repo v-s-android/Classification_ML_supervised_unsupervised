@@ -160,6 +160,7 @@ Also, display information about the coordinates like counts and data types.
 """
 df = df[['Latitude', 'Longitude']]
 df.info()
+df.head()
 """
 <class 'pandas.core.frame.DataFrame'>
 Index: 1938 entries, 1 to 7969
@@ -170,6 +171,107 @@ Data columns (total 2 columns):
  1   Longitude  1938 non-null   object
 dtypes: object(2)
 memory usage: 45.4+ KB
+
+	Latitude	Longitude
+1	55.2645508	-127.6428124
+2	45.963283	-66.6419017
+8	49.1763542	-123.112783
+13	49.261938	-123.151123
+15	49.88955855	-97.23574396
 """
+
+"""
+Exercise 5. We'll need these coordinates to be floats, not objects.
+Remove any museums that don't have coordinates, and convert the remaining coordinates to floats.
+"""
+# Remove observations with no coordinates 
+df = df[df.Latitude != ".." ]
+
+# Convert to float
+df[['Latitude', 'Longitude']] = df[['Latitude', 'Longitude']].astype('float')
+df.info()
+"""
+<class 'pandas.core.frame.DataFrame'>
+Index: 1607 entries, 1 to 7969
+Data columns (total 2 columns):
+ #   Column     Non-Null Count  Dtype  
+---  ------     --------------  -----  
+ 0   Latitude   1607 non-null   float64
+ 1   Longitude  1607 non-null   float64
+dtypes: float64(2)
+memory usage: 37.7 KB
+"""
+# --------------------------------------------------------------------------------------------------------------------------------
+"""
+Build a DBSCAN model
+Correctly scale the coordinates for DBSCAN (since DBSCAN is sensitive to scale)
+""""
+
+# In this case we know how to scale the coordinates. Using standardization would be an error becaues we aren't using the full range of the lat/lng coordinates.
+# Since longitude has a range of +/- 90 degrees and latitude ranges from 0 to 360 degrees, the correct scaling is to double the latitude coordinates (or half the longitudes)
+coords_scaled = df.copy()
+coords_scaled["Latitude"] = 2 * coords_scaled["Latitude"]
+
+"""
+Apply DBSCAN with Euclidean distance to the scaled coordinates¶
+In this case, reasonable neighbourhood parameters are already chosen for you. Feel free to experiment.
+"""
+min_samples = 3 # minimum number of samples needed to form a neighbourhood
+eps = 1.0 # neighbourhood search radius
+metric = 'euclidean'  # distance measure
+
+dbscan = DBSCAN(eps = eps, min_samples = min_samples, metric = metric).fit(coords_scaled) 
+
+"""
+Add cluster labels to the DataFrame
+"""
+df['Cluster'] = dbscan.fit_predict(coords_scaled) # here we are creating a new column
+
+print(df['Cluster'].value_counts())
+df.head()
+
+"""
+Cluster
+ 4     701
+ 2     192
+ 1     181
+ 7     134
+ 3      94
+-1      79
+ 6      30
+ 10     27
+ 8      21
+ 11     15
+ ...
+ 25      3
+ 29      3
+ 31      3
+ 30      3
+ 32      3
+ As you can see, there are two relatively large clusters and 79 points labelled as noise (-1).
+and
+
+	Latitude	Longitude	Cluster
+1	55.264551	-127.642812	0
+2	45.963283	-66.641902	1
+8	49.176354	-123.112783	2
+13	49.261938	-123.151123	2
+15	49.889559	-97.235744	3
+"""
+
+# Plot the museums on a basemap of Canada, colored by cluster label.
+plot_clustered_locations(df, title='Museums Clustered by Proximity')
+
+"""
+One key thing to notice here is that the clusters are not uniformly dense.
+
+For example, the points are quite densely packed in a few regions but are relatively sparse in between.
+
+DBSCAN agglomerates neighboring clusters together when they are close enough.
+
+Let's see how a hierarchical density-based clustering algorithm like HDBSCAN performs.
+"""
+ 
+
 
 

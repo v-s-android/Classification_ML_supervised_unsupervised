@@ -63,4 +63,50 @@ plt.show()
 Perform PCA on the dataset
 Next, you'll initialize a 2-component PCA model with default parameters and then fit and transform the feature space in one step.
 """
+pca_model = PCA(n_components = 2)
+X_pca = pca_model.fit_transform(X)
+
+"""
+Get the principal components from the model.
+The principal components are the principal axes, represented in feature space coordinates, which align with the directions of maximum variance in your data.
+"""
+components = pca_model.components_
+print(components)
+"""
+array([[ 0.78215821,  0.62307987],
+       [-0.62307987,  0.78215821]])
+"""
+# The principal components are sorted in decreasing order by their explained variance, which can be expressed as a ratio:
+pca_model.explained_variance_ratio_ 
+"""
+array([0.9111946, 0.0888054])
+"""
+
+# Exercise 2. What percentage of the variance in the data is explained by the first principal component?
+"""
+You can see that the first component explains over 90% of the variance in the data, while the second explains about 9%.
+"""
+
+"""
+Display the results
+Here, you'll use a scatterplot to display the data points in their original feature space, X1, X2.
+
+You'll also plot the projections of the data points onto their principal component directions.
+
+It's a bit technical, requiring some understanding of linear algebra, but the outcome will be instructive.
+
+Let's see how this works.
+
+Project the data onto its principal component axes
+The projection of the data onto a given principal component yields the coordinates of each of the data points along that component's direction.
+
+The new coordinates are given by the dot products of each point's coordinates with the given PCA component.
+
+Specifically, the projections are given by:
+"""
+
+
+
+
+
  

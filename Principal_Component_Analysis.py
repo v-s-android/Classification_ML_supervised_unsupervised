@@ -193,7 +193,21 @@ Let's start by loading the iris data and standardizing is features.
 # Load the Iris dataset
 iris = datasets.load_iris() # see "from sklearn import datasets"
 X = iris.data
+"""
+X=iris.data:  [[5.1 3.5 1.4 0.2]
+ [4.9 3.  1.4 0.2]
+ [4.7 3.2 1.3 0.2]
+ [4.6 3.1 1.5 0.2]
+ ...
+""" 
 y = iris.target
+"""
+y = iris.target:  [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+ 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2
+ 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ 2 2]
+ """
 
 target_names = iris.target_names
 print(target_names) # array(['setosa', 'versicolor', 'virginica'], dtype='<U10')
